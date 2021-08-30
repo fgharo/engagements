@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fad
+  namespace: dev1-digital
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fad
+  template:
+    metadata:
+      labels:
+        app: fad
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: fad-config
+        
