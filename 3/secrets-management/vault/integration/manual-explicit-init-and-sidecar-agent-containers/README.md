@@ -13,7 +13,11 @@ on the vault server.
 # Helper environment variable. Make sure there is only one name in this environment variable.
 # When you created the sa vault-auth, a secret was automatically created for you. 
 # Make sure you don't assign this to the docker secret.
-export VAULT_SA_JWT_AUTH_TOKEN_SECRET_NAME=$(oc get sa vault-auth --output jsonpath="{.secrets[0]['name']}")
+oc get secrets
+NAME                         TYPE                                  DATA   AGE
+...
+vault-auth-token-2jlhh  ...
+export VAULT_SA_JWT_AUTH_TOKEN_SECRET_NAME=vault-auth-token-2jlhh
 
 # This infor used to access the TokenReview API
 export VAULT_SA_JWT_AUTH_TOKEN=$(oc get secret $VAULT_SA_JWT_AUTH_TOKEN_SECRET_NAME --output 'go-template={{ .data.token }}' | base64 --decode)
