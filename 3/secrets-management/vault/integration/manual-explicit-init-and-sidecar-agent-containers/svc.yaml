@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: vault-agent-example
+  labels:
+    app: vault-agent-example
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: vault-agent-example
+  type: ClusterIP
+  sessionAffinity: None

@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vault-agent-example
+  labels:
+    app: vault-agent-example
+spec:
+  serviceAccountName: vault-auth
+  volumes:
+    - configMap:
+        items:
+          - key: vault-agent-config.hcl
+            path: vault-agent-config.hcl
+        name: example-vault-agent-config
+      name: config
+    # Is emptyDir in memory volume?
+    - emptyDir: {}
+      name: shared-data
+
+  initContainers:
+    # Init container to make sure the auth token and secrets up to date before the main container consumes the secrets.
+    # If we only have the sidecar could be a race condition, where the app consumes secrets that are not there yet and crashes if
+    # it needs those secrets for startup.
+    - image: vault
+      name: vault-agent-init
+      args:
+        - agent
+        - -config=/etc/vault/vault-agent-config.hcl
+        - -log-level=debug
+        - -exit-after-auth
+      env:
+        - name: VAULT_ADDR
+          value: "http://vault-fake-external-vault.apps-crc.testing"
+        - name: SKIP_SETCAP
+          value: 'true'
+      volumeMounts:
+        - mountPath: /etc/vault
+          name: config
+        - mountPath: /etc/secrets
+          name: shared-data
+
+  containers:
+    # Sidecar container to either reauthenticate or refresh/rerender secrets every 5 minutes
+    # https://www.vaultproject.io/docs/agent/template#renewals-and-updating-secrets
+    - image: vault
+      name: vault-agent-sidecar
+      args:
+        - agent
+        - -config=/etc/vault/vault-agent-config.hcl
+        - -log-level=debug
+      env:
+        - name: VAULT_ADDR
+          value: "http://vault-fake-external-vault.apps-crc.testing"
+        - name: SKIP_SETCAP
+          value: 'true'      
+      volumeMounts:
+        - mountPath: /etc/vault
+          name: config
+        - mountPath: /etc/secrets
+          name: shared-data
+
+    # Main Application Container.
+    - image: nginx
+      name: nginx-container
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: shared-data

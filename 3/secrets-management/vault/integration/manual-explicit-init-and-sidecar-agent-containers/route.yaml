@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: vault-agent-example
+  name: vault-agent-example
+spec:
+  port:
+    targetPort: 80
+  to:
+    kind: Service
+    name: vault-agent-example
+    weight: 100
+  wildcardPolicy: None
