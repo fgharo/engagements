@@ -4,10 +4,11 @@ Prereqs:
 Run these steps before doing one of the samples in this folder.
 
 
-1. A Kubernetes Cluster / I am using CRC Openshift
+1. A Kubernetes Cluster. I installed CRC Openshift. Please see links below.
 
-2. A Vault Server is up and running and the address is known ahead of time. I am running one on on CRC Openshift. Make sure to 
-have VAULT_ADDR environment variable setup.
+2. A Vault Server is up and running and the address is known ahead of time. I am running one on CRC Openshift and exposing a route to simulate external Vault Server. Please see links below.
+
+Make sure to have VAULT_ADDR environment variable setup for vault login.
 ```
 export VAULT_ADDR=http://vault-fake-external-vault.apps-crc.testing
 ```
@@ -40,3 +41,5 @@ oc apply -f vault-auth-service-account-cluster-role-binding.yaml
 References:
 
 https://learn.hashicorp.com/tutorials/vault/agent-kubernetes?in=vault/kubernetes
+https://crc.dev/crc/#installation_gsg
+https://learn.hashicorp.com/tutorials/vault/kubernetes-openshift?in=vault/kubernetes
