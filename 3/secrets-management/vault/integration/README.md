@@ -34,7 +34,7 @@ EOF
 ```
 oc new-project vault-consumer
 oc create sa vault-auth
-oc apply -f vault-auth-service-account-cluster-role-binding.yaml
+oc apply -f service-account-cluster-role-binding.yaml 
 ```
 
 
