@@ -41,5 +41,7 @@ oc apply -f service-account-cluster-role-binding.yaml
 References:
 
 https://learn.hashicorp.com/tutorials/vault/agent-kubernetes?in=vault/kubernetes
+
 https://crc.dev/crc/#installation_gsg
+
 https://learn.hashicorp.com/tutorials/vault/kubernetes-openshift?in=vault/kubernetes
