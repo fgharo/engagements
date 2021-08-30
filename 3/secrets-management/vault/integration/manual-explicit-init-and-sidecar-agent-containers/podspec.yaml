@@ -58,6 +58,13 @@ spec:
           name: config
         - mountPath: /etc/secrets
           name: shared-data
+      lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - sleep 5 && kill -SIGTERM $(pidof vault)
 
     # Main Application Container.
     - image: nginx
