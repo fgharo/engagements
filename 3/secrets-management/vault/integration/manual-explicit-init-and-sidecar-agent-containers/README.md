@@ -120,3 +120,5 @@ Notice that this is limited to the role that was setup in the namespace vault-co
 References:
 
 https://learn.hashicorp.com/tutorials/vault/agent-kubernetes?in=vault/kubernetes
+
+https://cloud.redhat.com/blog/integrating-hashicorp-vault-in-openshift-4
