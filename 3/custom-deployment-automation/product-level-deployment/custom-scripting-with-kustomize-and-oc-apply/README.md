@@ -1,3 +1,7 @@
+```
+cd scripts
+```
+
 Scenario 1: Seed a new namespace called dev1 with deployment applications defined in dev1 folder of deployConfig.
 
 ```
