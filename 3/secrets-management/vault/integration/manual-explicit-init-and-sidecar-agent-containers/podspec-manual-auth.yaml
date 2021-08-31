@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: devwebapp
+  labels:
+    app: devwebapp
+spec:
+  serviceAccountName: vault-auth
+  containers:
+    - name: devwebapp
+      image: burtlo/devwebapp-ruby:k8s
+      env:
+        - name: VAULT_ADDR
+          value: "http://192.168.1.100:8200"
+        - name: VAULT_TOKEN
+          value: root
+# KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+# curl --request POST  --data '{"jwt": "'"$KUBE_TOKEN"'", "role": "example"}'  $VAULT_ADDR/v1/auth/kubernetes/login
+# Worked got response:
+# {"request_id":"156dc70c-507c-f675-86b7-9cdf290b6f04","lease_id":"","renewable":false,"lease_duration":0,"data":null,"wrap_info":null,"warnings":null,"auth":{"client_token":"s.l4yLI1U3LmTgv8RXBwWE4PKo","accessor":"mgRIyKjYncQf07z24N9kvibj","policies":["default","myapp-kv-ro"],"token_policies":["default","myapp-kv-ro"],"metadata":{"role":"example","service_account_name":"vault-auth","service_account_namespace":"vault-consumer","service_account_secret_name":"vault-auth-token-v5hqh","service_account_uid":"08da5799-4ddf-4006-9bb7-90990388a16d"},"lease_duration":86400,"renewable":true,"entity_id":"c5d2ca35-6aa8-2581-24be-00a397c860fc","token_type":"service","orphan":true}}
+# Or more nicely put:
+# {
+#   "request_id": "156dc70c-507c-f675-86b7-9cdf290b6f04",
+#   "lease_id": "",
+#   "renewable": false,
+#   "lease_duration": 0,
+#   "data": null,
+#   "wrap_info": null,
+#   "warnings": null,
+#   "auth": {
+#     "client_token": "s.l4yLI1U3LmTgv8RXBwWE4PKo",
+#     "accessor": "mgRIyKjYncQf07z24N9kvibj",
+#     "policies": [
+#       "default",
+#       "myapp-kv-ro"
+#     ],
+#     "token_policies": [
+#       "default",
+#       "myapp-kv-ro"
+#     ],
+#     "metadata": {
+#       "role": "example",
+#       "service_account_name": "vault-auth",
+#       "service_account_namespace": "vault-consumer",
+#       "service_account_secret_name": "vault-auth-token-v5hqh",
+#       "service_account_uid": "08da5799-4ddf-4006-9bb7-90990388a16d"
+#     },
+#     "lease_duration": 86400,
+#     "renewable": true,
+#     "entity_id": "c5d2ca35-6aa8-2581-24be-00a397c860fc",
+#     "token_type": "service",
+#     "orphan": true
+#   }
+# }

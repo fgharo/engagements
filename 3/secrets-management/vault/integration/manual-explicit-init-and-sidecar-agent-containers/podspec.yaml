@@ -30,7 +30,7 @@ spec:
         - -exit-after-auth
       env:
         - name: VAULT_ADDR
-          value: "http://vault-fake-external-vault.apps-crc.testing"
+          value: "http://192.168.1.100:8200"
         - name: SKIP_SETCAP
           value: 'true'
       volumeMounts:
@@ -50,7 +50,7 @@ spec:
         - -log-level=debug
       env:
         - name: VAULT_ADDR
-          value: "http://vault-fake-external-vault.apps-crc.testing"
+          value: "http://192.168.1.100:8200"
         - name: SKIP_SETCAP
           value: 'true'      
       volumeMounts:
