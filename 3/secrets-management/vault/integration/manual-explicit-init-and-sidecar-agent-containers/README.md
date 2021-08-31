@@ -104,6 +104,7 @@ oc apply -f podspec-manual-auth.yaml
 ```
 
 Open the terminal to the pod and issue a curl command.
+CAUTION: if tls certificates are bad and you need to quickly just test out the integration, you can turn off the tls verification in the curk command by passing -k.
 ```
 oc debug pod/devwebapp
 
