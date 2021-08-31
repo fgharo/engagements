@@ -121,6 +121,8 @@ oc apply -f configmap.yaml
 ```
 
 Run the test pod with a route that we can click on to see the rendering of the secret values.
+
+CAUTION: if tls certificates are bad and you need to quickly just test out the integration, you can turn off the tls verification by setting environment variable VAULT_SKIP_VERIFY on the pod specs environment variable list. This can also be set on the vault-agent-config.hcl file defined in the configmap applied earlier. Please refer to links below for full agent configuration settings.
 ```
 oc apply -f podspec.yaml
 oc apply -f svc.yaml
@@ -150,3 +152,5 @@ References:
 https://learn.hashicorp.com/tutorials/vault/agent-kubernetes?in=vault/kubernetes
 
 https://cloud.redhat.com/blog/integrating-hashicorp-vault-in-openshift-4
+
+https://www.vaultproject.io/docs/agent
