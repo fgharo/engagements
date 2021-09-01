@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+.block-style {
+    background-color: #282c34;
+    min-height: 20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }

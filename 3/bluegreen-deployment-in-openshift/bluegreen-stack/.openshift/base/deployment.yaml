@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bluegreen-stack
+  name: bluegreen-stack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: bluegreen-stack
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        deployment: bluegreen-stack
+    spec:
+      containers:
+      - image: 'bluegreen-stack'
+        name: bluegreen-stack
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: bluegreen-stack-config1
+        resources: {}
+        volumeMounts:     
+        # - name: config1
+        #   mountPath: /tmp/example.properties
+        #   subPath: example.properties
+        - name: config2
+          mountPath: /tmp/config.json
+          subPath: config.json
+      volumes:
+      # - name: config1
+      #   configMap:
+      #     name: bluegreen-stack-config1
+      - name: config2
+        configMap:
+          name: bluegreenstackconfig
+status: {}

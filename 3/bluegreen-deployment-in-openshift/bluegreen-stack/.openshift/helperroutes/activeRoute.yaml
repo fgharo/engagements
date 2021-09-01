@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: bluegreen-stack
+    app.kubernetes.io/name: bluegreen-stack
+  name: bluegreen-stack
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: bluegreen-stack-blue
+    weight: 100
+  wildcardPolicy: None
