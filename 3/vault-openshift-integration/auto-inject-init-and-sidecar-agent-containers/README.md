@@ -1,5 +1,5 @@
 In this section we will use a Vault Agent Injector Service to auto-inject init and sidecar vault agents
-to pods/deployments/etc that have the appropriate annotations. Also the Vault Agent Injector and the init,side car containers will 
+to pods/deployments/etc that have the appropriate annotations. Also the Vault Agent Injector will 
 call off to an external Vault Server.
 
 Prereqs:

@@ -56,7 +56,7 @@ EOF
 ```
 oc new-project vault-consumer
 oc create sa vault-auth
-oc apply -f manual-explicit-init-and-sidecar-agent-containers/service-account-cluster-role-binding.yaml 
+oc apply -f service-account-cluster-role-binding.yaml 
 ```
 
 
