@@ -1,0 +1,37 @@
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta2
+metadata:
+  name: openshift-toolbox-hpa
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: openshift-toolbox
+    apiVersion: apps/v1
+  # minReplicas: 1 
+  # If not set, the DEFAULT minReplicas will be set to 1
+  maxReplicas: 9
+  # metrics: 
+  # If not set, the DEFAULT metric will be set to 80% of average CPU utilization.
+  # - type: Resource
+  #   resource:
+  #     name: cpu
+  #     target:
+  #       type: Utilization
+  #       averageUtilization: 80
+
+  # behavior:
+  # behavior configures the scaling behavior of the target in both Up and Down
+  # directions (scaleUp and scaleDown fields respectively). If not set, the
+  # default HPAScalingRules for scale up and scale down are used.
+  
+  #   scaleDown: {...} 
+  #   scaleDown is scaling policy for scaling Down. If not set, the default value
+  #   is to allow to scale down to minReplicas pods, with a 300 second
+  #   stabilization window (i.e., the highest recommendation for the last 300sec
+  #   is used). 
+
+  #   scaleUp: {...}
+  #   scaleUp is scaling policy for scaling Up. If not set, the default value is
+  #   the higher of:
+  #   * increase no more than 4 pods per 60 seconds
+  #   * double the number of pods per 60 seconds No stabilization is used.

@@ -1,0 +1,36 @@
+apiVersion: autoscaling/v2beta2 
+kind: HorizontalPodAutoscaler
+metadata:
+  name: openshift-toolbox-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1 
+    kind: Deployment 
+    name: openshift-toolbox
+  minReplicas: 1
+  maxReplicas: 9
+  metrics: 
+  - type: Resource
+    resource:
+      name: memory 
+      target:
+        type: AverageValue 
+        averageValue: 5Mi 
+  behavior: 
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+    scaleUp: 
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      selectPolicy: Max

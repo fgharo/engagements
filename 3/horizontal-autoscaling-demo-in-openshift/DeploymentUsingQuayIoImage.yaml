@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openshift-toolbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openshift-toolbox
+  template:
+    metadata:
+      labels:
+        app: openshift-toolbox
+    spec:
+      containers:
+      - name: openshift-toolbox
+        image: quay.io/user15/openshift-toolbox:basic
+        resources:
+        ports:
+        - containerPort: 80
+        env:
+          - name: TZ
+            value: "America/Phoenix"
+          - name: DATE_FORMAT
+            value: "+%a %d %B %Y %r %Z"
