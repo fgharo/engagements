@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: vault-demo
+  namespace: dev
+  labels:
+    app: vault-demo
+    app.kubernetes.io/component: vault-demo
+    app.kubernetes.io/instance: vault-demo
+spec:
+  to:
+    kind: Service
+    name: vault-demo
+    weight: 100
+  port:
+    targetPort: 8080-tcp

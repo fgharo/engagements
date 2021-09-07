@@ -1,62 +1,63 @@
-# Read Me First
-This project is to explore and demo integrating vault with a spring boot app using spring cloud vault.
+# Vault Openshift Integration with Spring Boot app and Consul Template Markup
+This project is to explore and demo integrating vault with a spring boot app using consul template markup, vault agent, an agent configuration file, and
+kubernetes resources expressing the agent as an init container in a kubernetes deployment.
 
-# Getting Started
 
 Prereqs:
-1. Get access to VisTracks vault namespace. https://ot1v30.atlassian.net/wiki/spaces/OMT/pages/943620592/Vault+Integration
-2. Login to webui https://omni-dev-vault.aws.omnitracs.com:8200/
-3. Add key/value pairs under secrets engine:
-vistracks/vault-demo/dev
-
-key: spring.datasource.username value: harry
-
-key: spring.datasource.password value: potter
-
-key: vault-demo.made.up.property value: Made stuff up!!!
+1. You have ran setup as described in parent ../README.md and sample ../manual-explicit-init-and-sidecar-agent-containers.
 
 
-## Quick and dirty way to save/use server's self signed ssl certificate in app 
-FYI There is already a keystore.jks file in src/main/resources but if it expires you can use these instructions.
+## Main Steps:
 
-1. Either 
-    
-    a. When opening vault on the browser, Export ssl certificate from chrome as .crt file.
- 
-    OR
- 
-    b. issue the following commands:
-    
+1. There is some sample secret in the vault server:
 ```
-export VAULT_CERT_HOST=omni-dev-vault.aws.omnitracs.com
-echo false | openssl s_client -connect ${VAULT_CERT_HOST}:8200 -servername ${VAULT_CERT_HOST} -showcerts|openssl x509>/tmp/vault-demo/${VAULT_CERT_HOST}.crt;
+vault kv put secret/myapp/vault-demo-config-secret     username='appuser'     password='suP3rsec(et!'     ttl='30s'
 ```
 
-2. Add the .crt file to a keystore.jks file.
+2. Make sure the app container image is accessible. For me, I have mine hosted at quay.io/user15/vault-demo:latest. The value is
+configured in the .openshift/base/deployment.yaml file.
 
-`keytool -importcert -file /tmp/vault-demo/omni-dev-vault.aws.omnitracs.com.crt -keystore /tmp/vault-demo/keystore.jks -alias omni-dev-vault.aws.omnitracs.com`
+3. Make sure the namespace you would like to deploy this application to has its name configured in the Vault kubernetes auth method configuration role called example. For my purposes I used the namespace dev. So I made sure that was configured on the vault server.
+```
+vault write auth/kubernetes/role/example  \
+    bound_service_account_names=vault-auth   \
+    # Make sure not to erase other namespaces that were configured in the past. Probably better to use ui for this part
+    # If there are a lot of namespaces.
+    bound_service_account_namespaces=vault-consumer,dev  \    
+    policies=myapp-kv-ro    \
+    ttl=24h
+``` 
 
-3. Place keystore.jks in src/main/resources
+4. Make sure there is a service account called vault-auth in the namespace where we are deploying this application.
+```
+oc create sa vault-auth -n dev
+```    
 
-4. When building with maven below, it should place the keystore.jks in the classpath.
+5. Deploy the application to CRC Openshift.
 
-5. When running application below we can either 
-    
-    a. Reference the keystore.jks by setting properties in boostrap.yml spring.cloud.vault.ssl.trust-store and spring.cloud.vault.ssl.trust-store-password
+```
+cd .openshift/base
+kustomize edit set namespace dev
+kustomize build | oc apply -f - -n dev
+```
 
-    OR
+6. Testing out that the secret got injected.
 
-    b. Override the command line property when running the jar by appending the following command line arguments:
+a. Get the application route.
+```
+oc get route -n dev
+```
+b. Visit the route in a browser with the path /h2-console
 
-`--spring.cloud.vault.ssl.trust-store=file:/tmp/vault-demo/keystore.jks --spring.cloud.vault.ssl.trust-store-password=changeit`
-  
+c. Login with JDBC URL as jdbc:h2:mem:testdb, username as h2user and password as suP3rsec(et! (Or with whatever value you created in step 1. above.)
 
+# Running this application locally.
 
 ## Building the application
 `mvn clean install`
 
 
-## Running the application
+## Running the application locally.
 
 Using environment variables:
 
@@ -79,7 +80,7 @@ If everything went fine you should see these logs in the startup log output:
 ```
 
 ## Using the application
-If set up went fine then hit localhost:8080/h2-console and login with JDBC URL as jdbc:h2:mem:testdb username as harry and password as potter. You should have access to the h2 in memory db via the h2 console.
+If set up went fine then hit localhost:8080/h2-console and login with JDBC URL as jdbc:h2:mem:testdb username as h2user and password as h2pass. You should have access to the h2 in memory db via the h2 console.
 
 
 ### Reference Documentation
