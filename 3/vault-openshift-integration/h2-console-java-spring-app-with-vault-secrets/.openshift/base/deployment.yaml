@@ -1,0 +1,93 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: vault-demo
+  namespace: dev
+  labels:
+    app: vault-demo
+    app.kubernetes.io/component: vault-demo
+    app.kubernetes.io/instance: vault-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: vault-demo
+  template:
+    metadata:
+      labels:
+        deployment: vault-demo
+    spec:
+      serviceAccountName: vault-auth
+      volumes:
+        # Configures the Vault Agent
+        - name: agent-config
+          configMap:
+            items:
+              - key: vault-agent-config.hcl
+                path: vault-agent-config.hcl
+            name: vault-agent-config-cm
+
+        # Loads the app properties with template expressions. Processing hasn't been done yet.
+        - name: app-config-before-processing
+          configMap:
+            items:
+              - key: application.properties
+                path: application.properties
+            name: app-config-cm
+
+        # A shared directory where the vault-agent can write the output of the template processing
+        # to a folder that the java service expects. Then the java service can read from that path.
+        - emptyDir: {}
+          name: shared-data
+
+          
+
+      initContainers:
+      # Init container to make sure the auth token and secrets up to date before the main container consumes the secrets.
+      # If we only have the sidecar could be a race condition, where the app consumes secrets that are not there yet and crashes if
+      # it needs those secrets for startup.
+      - image: quay.io/user15/vault:latest
+        name: vault-agent-init
+        args:
+          - agent
+          - -config=/etc/vault/vault-agent-config.hcl
+          - -log-level=debug
+          - -exit-after-auth
+        env:
+          - name: VAULT_ADDR
+            value: "http://192.168.1.100:8200"
+          - name: SKIP_SETCAP
+            value: 'true'
+        volumeMounts:
+          # Mount volume agent-config, which has the file vault-agent-config.hcl, to mount path /etc/vault/
+          - mountPath: /etc/vault
+            name: agent-config
+
+          # Mount volume app-config-before-processing, which has the file applicaiton.properties (with consul template markup or expressions
+          # that tell the vault agent to fetch/inject secrets data), onto mount path /tmp/application.properties. This will represent the 
+          # source configuration in the vault-agent-config.hcl, which tells the agent where the location is of the file to process.
+          - mountPath: /tmp/application.properties
+            subPath: application.properties
+            name: app-config-before-processing
+
+          # Mount volume shared-data to path /deployments/config. This will represent the destination configuration in the vault-agent-config.hcl, 
+          # which tells the agent where the location is to output the process file. This is also where the spring app will pick up the properties from.
+          - mountPath: /deployments/config
+            name: shared-data
+
+      containers:
+        - name: vault-demo
+          image: quay.io/user15/vault-demo:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+          # Use the shared-data volume to mount the directory where the init container placed the generated properties file.
+          # The spring boot application properties is overwritten by placing application.properties file at directory /deployments/config.
+          - mountPath: /deployments/config
+            name: shared-data
