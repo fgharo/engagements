@@ -28,17 +28,17 @@ spec:
               name: bluegreen-stack-config1
         resources: {}
         volumeMounts:     
-        # - name: config1
-        #   mountPath: /tmp/example.properties
-        #   subPath: example.properties
+        - name: config1
+          mountPath: /tmp/example.properties
+          subPath: example.properties
         - name: config2
           mountPath: /tmp/config.json
           subPath: config.json
       volumes:
-      # - name: config1
-      #   configMap:
-      #     name: bluegreen-stack-config1
+      - name: config1
+        configMap:
+          name: bluegreen-stack-config1
       - name: config2
         configMap:
-          name: bluegreenstackconfig
+          name: bluegreen-stack-config2
 status: {}

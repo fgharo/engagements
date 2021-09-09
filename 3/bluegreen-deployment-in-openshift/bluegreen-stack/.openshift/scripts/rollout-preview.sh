@@ -14,9 +14,9 @@ then
   echo "This will be the first deployment"
   cd ../base
   kustomize edit set image "${APP_NAME}=$1"
-  kustomize edit add label "app.kubernetes.io/name":"${APP_NAME}"
-  kustomize edit add label "app.kubernetes.io/version":"${version}"
-  kustomize edit add label "app.color":"blue"
+  kustomize edit add label -f "app.kubernetes.io/name":"${APP_NAME}"
+  kustomize edit add label -f "app.kubernetes.io/version":"${version}"
+  kustomize edit add label -f "app.color":"blue"
   kustomize edit set namesuffix -- -blue
   kustomize build | oc apply -f -
   oc apply -f ../helperroutes/activeRoute.yaml 
@@ -38,9 +38,9 @@ else
   echo "Get ready to deploy ${previewColor} to preview status."
   cd ../base
   kustomize edit set image "${APP_NAME}=$1"
-  kustomize edit add label "app.kubernetes.io/name":"${APP_NAME}"
-  kustomize edit add label "app.kubernetes.io/version":"${version}"
-  kustomize edit add label "app.color":"${previewColor}"
+  kustomize edit add label -f "app.kubernetes.io/name":"${APP_NAME}"
+  kustomize edit add label -f "app.kubernetes.io/version":"${version}"
+  kustomize edit add label -f "app.color":"${previewColor}"
   kustomize edit set namesuffix -- -${previewColor}
   previewServiceName=${APP_NAME}-${previewColor}
   # editting the labels earlier results in updating the matchLabels of the yaml during the apply but these are immutable.
