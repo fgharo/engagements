@@ -20,7 +20,7 @@ spec:
     # Init container to make sure the auth token and secrets up to date before the main container consumes the secrets.
     # If we only have the sidecar could be a race condition, where the app consumes secrets that are not there yet and crashes if
     # it needs those secrets for startup.
-    - image: vault
+    - image: quay.io/user15/vault:latest
       name: vault-agent-init
       args:
         - agent
@@ -41,7 +41,7 @@ spec:
   containers:
     # Sidecar container to either reauthenticate or refresh/rerender secrets every 5 minutes
     # https://www.vaultproject.io/docs/agent/template#renewals-and-updating-secrets
-    - image: vault
+    - image: quay.io/user15/vault:latest
       name: vault-agent-sidecar
       args:
         - agent
