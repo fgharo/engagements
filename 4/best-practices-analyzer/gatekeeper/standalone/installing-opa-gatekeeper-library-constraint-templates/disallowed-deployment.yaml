@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bluegreen-stack
+  name: bluegreen-stack
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      deployment: bluegreen-stack
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        deployment: bluegreen-stack
+    spec:
+      containers:
+      - image: quay.io/user15/bluegreen-stack:1.0
+        name: bluegreen-stack
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8888
+          protocol: TCP
+status: {}
