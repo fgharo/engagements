@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: ns-must-have-gk
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+  parameters:
+    labels: ["gatekeeper"]
+# $ oc apply -f samples/constraint.yaml 
+# k8srequiredlabels.constraints.gatekeeper.sh/ns-must-have-gk created
+# {"level":"info","ts":1638158854.1074324,"logger":"controller","msg":"constraint added to OPA","process":"constraint_controller","event_type":"constraint_added","constraint_group":"constraints.gatekeeper.sh","constraint_api_version":"v1beta1","constraint_kind":"K8sRequiredLabels","constraint_name":"ns-must-have-gk","constraint_action":"deny","constraint_status":"enforced"}
