@@ -1,0 +1,25 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: example
+  namespace: default
+spec:
+  selector:
+    app: httpd
+  replicas: 1 # If there is more than 1 replica, will ACM, OPA/Gatekeeper, and Kyverno report more violations?
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+        - name: httpd
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            tcpSocket: 
+              port: 8080
+            initialDelaySeconds: 15
+            timeoutSeconds: 1

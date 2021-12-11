@@ -1,0 +1,13 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-pods-musthave-liveness-probes
+  namespace: default
+placementRef:
+  name: placement-policy-pods-musthave-liveness-probes
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-pods-musthave-liveness-probes
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
