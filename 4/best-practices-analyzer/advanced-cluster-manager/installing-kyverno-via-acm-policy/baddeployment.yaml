@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: badexample1
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: badhttpd1
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: badhttpd1
+    spec:
+      containers:
+        - name: httpd
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+          ports:
+            - containerPort: 8080
+          # Missing livenessProbe
