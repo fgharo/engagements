@@ -1,0 +1,10 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: AtleastOneRouteFollowsPattern
+metadata:
+  name: atleastoneroutefollowspattern
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]

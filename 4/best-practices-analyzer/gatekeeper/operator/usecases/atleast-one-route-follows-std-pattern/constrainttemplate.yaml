@@ -1,0 +1,28 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: atleastoneroutefollowspattern
+spec:
+  crd:
+    spec:
+      names:
+        kind: AtleastOneRouteFollowsPattern
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |-        
+        package ocp.bestpractices.atleast_one_route_follows_pattern
+
+        violation[{"msg": msg}] {       
+          routes := allRoutes
+          serviceRoutes := [route | routes[i].spec.to.name == input.review.object.metadata.name
+                                    endswith(routes[i].spec.host, ".glb.stfmcloud.app")
+                                    route := routes[i]]
+          numOfRoutes := count(serviceRoutes)
+          numOfRoutes == 0
+          msg := sprintf("Routes should follow pattern <route_name>-<project_name>.<np> OR <prod>.glb.stfmcloud.app. There were %v routes that followed this pattern.", [numOfRoutes])
+        }
+
+        allRoutes[route] { 
+          serviceNamespace := input.review.object.metadata.namespace
+          route :=  data.inventory.namespace[serviceNamespace]["route.openshift.io/v1"]["Route"][_]
+        }
