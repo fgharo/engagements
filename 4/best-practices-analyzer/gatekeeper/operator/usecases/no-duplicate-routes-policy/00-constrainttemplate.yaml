@@ -1,0 +1,27 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: noduplicateroutes
+spec:
+  crd:
+    spec:
+      names:
+        kind: NoDuplicateRoutes
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      # In order to do analysis on other objects other than the one being analyzed we require syncing/caching turned on. https://open-policy-agent.github.io/gatekeeper/website/docs/sync
+      rego: |-        
+        package ocp.bestpractices.no_duplicate_routes
+
+        violation[{"msg": msg}] {       
+          routes := allRoutes
+          serviceRoutes := [route | routes[i].spec.to.name == input.review.object.metadata.name; route := routes[i]]
+          numOfRoutes := count(serviceRoutes)
+          numOfRoutes > 1
+          msg := sprintf("No duplicate routes allowed. %v %v has %v routes pointed at it.", [input.review.object.kind, input.review.object.metadata.name, numOfRoutes])
+        }
+
+        allRoutes[route] { 
+          serviceNamespace := input.review.object.metadata.namespace
+          route :=  data.inventory.namespace["default"]["route.openshift.io/v1"]["Route"][_]
+        }

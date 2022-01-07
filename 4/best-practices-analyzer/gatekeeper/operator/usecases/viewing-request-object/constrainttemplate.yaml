@@ -1,0 +1,18 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyall
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyAll
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      # This is purely for debugging/troubleshooting purposes https://open-policy-agent.github.io/gatekeeper/website/docs/debug
+      rego: |
+        package k8sdenyall
+
+        violation[{"msg": msg}] {
+          msg := sprintf("REVIEW OBJECT: %v", [data.inventory.namespace["default"]["route.openshift.io/v1"]["Route"]])
+        }
