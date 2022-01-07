@@ -23,5 +23,5 @@ spec:
 
         allRoutes[route] { 
           serviceNamespace := input.review.object.metadata.namespace
-          route :=  data.inventory.namespace["default"]["route.openshift.io/v1"]["Route"][_]
+          route :=  data.inventory.namespace[serviceNamespace]["route.openshift.io/v1"]["Route"][_]
         }
