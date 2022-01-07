@@ -1,6 +1,8 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: none
   name: require-liveness-probes
 spec:
   validationFailureAction: audit
@@ -10,11 +12,13 @@ spec:
     match:
       resources:
         kinds:
-        - Pod
+        - DeploymentConfig
         namespaces: ["default"]
     validate:
       message: "Liveness probes are required."
       pattern:
         spec:
-          containers:
-          - livenessProbe: "*"
+          template:
+            spec:
+              containers:
+              - livenessProbe: "*"
