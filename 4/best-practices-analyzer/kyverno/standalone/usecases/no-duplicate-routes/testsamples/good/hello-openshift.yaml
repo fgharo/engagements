@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-openshift
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-openshift
+  template:
+    metadata:
+      labels:
+        app: hello-openshift
+    spec:
+      containers:
+      - name: hello-openshift
+        image: openshift/hello-openshift:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: hello-openshift-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-openshift-svc
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello-openshift-route
+spec:
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: hello-openshift-svc
+    weight: 100
+  wildcardPolicy: None

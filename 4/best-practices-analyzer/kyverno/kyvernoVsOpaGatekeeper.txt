@@ -1,0 +1,36 @@
+Pros of using OPA Gatekeeper?
+It uses OPA which can be used on non Kubernetes stuff. So if we wanted to put policies 
+
+Cons of using OPA Gatekeeper?
+Have to learn REGO
+
+
+
+Cons of Kyverno
+-Audits everything even success, this could be bad for performance.
+-Audits carry outdated data around in reports resources. 
+
+
+Kyverno version 
+I1216 04:32:25.264083       1 version.go:17]  "msg"="Kyverno"  "Version"="v1.5.0-rc1-150-gc8e5750c"
+
+
+
+Can Kyverno exempt namespaces from its scan?
+How frequent is it's scan cycle?
+
+
+
+References:
+https://github.com/developer-guy/policy-as-code-war
+https://kyverno.io/docs/
+https://kyverno.io/policies/best-practices/require_probes/require_probes/
+
+
+
+Check nullability in either OPA Gatekeeper or Kyverno.
+For example, if an actual Pod or DeploymentConfig has livenessProbe: null, will this pass the test?
+
+
+
+Do deployer and builder pods get triggered

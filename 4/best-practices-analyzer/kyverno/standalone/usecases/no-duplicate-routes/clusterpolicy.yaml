@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-no-route-duplicates
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: validate-serviceHasOnlyOneRoute
+    match:
+      resources:
+        kinds:
+        - Service
+        namespaces: ["default"]
+    context:
+      - name: routeCount
+        # https://kyverno.io/docs/writing-policies/external-data-sources/#variables-from-kubernetes-api-server-calls
+        apiCall:
+          urlPath: "/apis/route.openshift.io/v1/namespaces/{{ request.namespace }}/routes"
+          jmesPath: "items[?spec.to.name == '{{ request.object.metadata.name }}'] | length(@)"
+    validate:
+      message: "Routes should not be duplicated. There are {{ routeCount }} routes for service {{ request.object.metadata.name }}."
+      deny:
+        conditions:
+        - key: "{{ routeCount }}"
+          operator: GreaterThan
+          value: 1

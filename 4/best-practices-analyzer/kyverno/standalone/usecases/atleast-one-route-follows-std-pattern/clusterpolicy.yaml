@@ -1,0 +1,31 @@
+# <route_name>-<project_name>.<np> or <prod>.glb.stfmcloud.app
+# valid routes
+# appxyz-clo-myproject-dev.np.glb.stfmcloud.app
+# clo-myproject-prod.prod.glb.stfmcloud.app
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-atleast-one-route-that-follows-pattern
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: validate-serviceHasAtleastOneRouteThatFollowsPattern
+    match:
+      resources:
+        kinds:
+        - Service
+        namespaces: ["default"]
+    context:
+      - name: routeCount
+        apiCall:
+          urlPath: "/apis/route.openshift.io/v1/namespaces/{{ request.namespace }}/routes"
+          #jmesPath: "items[?spec.to.name == '{{ request.object.metadata.name }}'] | [?ends_with(spec.host, '.glb.stfmcloud.app')]"
+          jmesPath: "items[?spec.to.name == '{{ request.object.metadata.name }}'].spec.host | [?ends_with(@, '.glb.stfmcloud.app')] | length(@)"
+    validate:
+      message: "Routes should follow pattern <route_name>-<project_name>.<np> OR <prod>.glb.stfmcloud.app. There were {{routeCount}} routes that followed this pattern."
+      deny:
+        conditions:
+        - key: "{{ routeCount }}"
+          operator: Equals
+          value: 0

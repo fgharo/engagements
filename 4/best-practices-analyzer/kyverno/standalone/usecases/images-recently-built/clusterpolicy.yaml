@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: image-is-recently-built
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: ...
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces: ["default"]
+    context:
+      - name: imageBuildDate
+        apiCall:
+          urlPath: "/apis/image.openshift.io/v1/images"
+          jmesPath: "items[?contains(dockerImageReference,'{{ request.object.spec.containers[0].image }}')] | [0].dockerImageMetadata.ContainerConfig.Labels.\"build-date\""
+    validate:
+      message: "The image was built too long ago (Over 7 days ago). Old images tend to have outdated packages/dependencies and could have vulnerabilities."
+      deny:
+        conditions:
+        - key: "{{ time_since(RFC3339, imageBuildDate, '') }}"
+          operator: GreaterThan
+          # Unfortunatly because of Go and function time_since this has to be expressed in hours. https://github.com/kyverno/kyverno/issues/2873
+          value: 168h
